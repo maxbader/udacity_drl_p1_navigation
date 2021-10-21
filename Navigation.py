@@ -3,6 +3,8 @@ import numpy as np
 
 env = UnityEnvironment(file_name="./Banana_Linux/Banana.x86")
 
+
+
 # get the default brain
 brain_name = env.brain_names[0]
 brain = env.brains[brain_name]
