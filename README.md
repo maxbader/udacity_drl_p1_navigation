@@ -2,6 +2,19 @@
 
 [image1]: https://user-images.githubusercontent.com/10624937/42135619-d90f2f28-7d12-11e8-8823-82b970a54d7e.gif "Trained Agent"
 
+# Install
+
+### Ubuntu 20.04
+
+1. Install anaconda3
+2. Create conda enviroment
+```
+conda create --name udacity
+conda activate udacity
+cd ...../p1_navigation/
+pip3 install -r requirements.txt
+```
+
 # Project 1: Navigation
 
 ### Introduction
