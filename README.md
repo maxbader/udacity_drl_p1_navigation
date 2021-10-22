@@ -15,6 +15,13 @@ cd ...../p1_navigation/
 pip3 install -r requirements.txt
 ```
 
+### Delete python kernel
+
+```
+jupyter kernelspec list
+jupyter kernelspec uninstall unwanted-kernel
+```
+ 
 # Project 1: Navigation
 
 ### Introduction
