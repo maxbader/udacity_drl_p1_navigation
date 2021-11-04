@@ -1,6 +1,9 @@
-[//]: # (Image References)
+# Porject 1: Details to my Solution 
 
-[image1]: https://user-images.githubusercontent.com/10624937/42135619-d90f2f28-7d12-11e8-8823-82b970a54d7e.gif "Trained Agent"
+For this project I used the DeepQNetwork used in the Lunar Landing example as base.
+
+On the end I found that a network with two hidden layers 128x128 with a replaybuffer worked best and I was able to solve the challange within 1700 interation but also in 1100 using dropouts.
+
 
 # Install
 
