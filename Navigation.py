@@ -4,15 +4,14 @@ import torch
 from collections import deque
 from dqn_agent import Agent
 
-if False:
-    env = UnityEnvironment(file_name="./Banana_Linux/Banana.x86_64")
-    #env = UnityEnvironment(file_name="./Banana_Linux_NoVis/Banana.x86_64")
+#env = UnityEnvironment(file_name="./Banana_Linux/Banana.x86_64")
+env = UnityEnvironment(file_name="./Banana_Linux_NoVis/Banana.x86_64")
 
-    # get the default brain
-    brain_name = env.brain_names[0]
-    brain = env.brains[brain_name]
+# get the default brain
+brain_name = env.brain_names[0]
+brain = env.brains[brain_name]
 
-def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[256, 256]):
+def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[256, 256], drop_p=0.0):
     """Deep Q-Learning.
 
     Params
@@ -48,14 +47,35 @@ def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, h
         eps = max(eps_end, eps_decay*eps) # decrease epsilon
         print('\r\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)), end="")
         if i_episode % 100 == 0:
-            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
-            agent.save_checkpoint('checkpoint_trained.pth')
-        if np.mean(scores_window)>=13.0:
-            print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode-100, np.mean(scores_window)))
-            agent.save_checkpoint('checkpoint_trained.pth')
+            if np.mean(scores_window)<13.0:
+                print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
+                agent.save_checkpoint('checkpoint_trained.pth')
+
+            else:
+                print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode-100, np.mean(scores_window)))
+                agent.save_checkpoint('checkpoint_solved.pth')
     return scores
 
-print("hello")
-for i in range(0,10):
-    filename = 'checkpoint_trained' + str(i).zfill(5) + '.pth'
-    print(filename)
+
+scores = dict()
+
+scores['hidden_layers = [128,128], drop_p=0.0]'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0)
+
+import matplotlib.pyplot as plt
+import numpy as np
+plt.rcParams['figure.figsize'] = [20, 20]
+def running_mean(x, N):
+    cumsum = np.cumsum(np.insert(x, 0, 0))
+    return (cumsum[N:] - cumsum[:-N]) / float(N)
+
+fig, axs = plt.subplots(len(scores))
+idx_plot = 0
+for key, value in scores.items():
+    score = scores[key]
+    score_mean = running_mean(score, 100)
+    axs[idx_plot].set_title(key)
+    axs[idx_plot].plot(score)
+    axs[idx_plot].plot(score_mean)
+    axs[idx_plot].grid()
+    idx_plot = idx_plot + 1
+    
