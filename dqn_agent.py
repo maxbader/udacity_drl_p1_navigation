@@ -2,25 +2,24 @@ import numpy as np
 import random
 from collections import namedtuple, deque
 
-from model import QNetwork
-
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
+import qnetwork
 
 BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 64        # minibatch size
+BATCH_SIZE = 64         # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR = 5e-4               # learning rate 
-UPDATE_EVERY = 1000     # how often to update the network
+UPDATE_EVERY = 50       # how often to update the network
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Agent():
     """Interacts with and learns from the environment."""
 
-    def __init__(self, state_size, action_size, seed):
+    def __init__(self, state_size, action_size, seed, hidden_layers=[256, 256], drop_p=0.0):
         """Initialize an Agent object.
         
         Params
@@ -28,14 +27,15 @@ class Agent():
             state_size (int): dimension of each state
             action_size (int): dimension of each action
             seed (int): random seed
+            hidden_layers: list of integers, the sizes of the hidden layers
         """
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(seed)
 
         # Q-Network
-        self.qnetwork_local = QNetwork(state_size, action_size, seed).to(device)
-        self.qnetwork_target = QNetwork(state_size, action_size, seed).to(device)
+        self.qnetwork_local =  qnetwork.Network(state_size, action_size, hidden_layers, drop_p).to(device)
+        self.qnetwork_target = qnetwork.Network(state_size, action_size, hidden_layers, drop_p).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
@@ -43,7 +43,7 @@ class Agent():
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
         
-        print('Agent Device: {}'.format(device))
+        print('\nAgent Device: {}'.format(device))
     
     def step(self, state, action, reward, next_state, done):
         # Save experience in replay memory
@@ -118,6 +118,26 @@ class Agent():
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
 
+    def save_checkpoint(self, file):
+        checkpoint = {'input_size': self.qnetwork_local.input_size,
+              'output_size': self.qnetwork_local.output_size,
+              'hidden_layers': [each.out_features for each in self.qnetwork_local.hidden_layers],
+              'drop_p': self.qnetwork_local.drop_p,
+              'state_dict': self.qnetwork_local.state_dict()}
+        torch.save(checkpoint, file)
+        
+    def load_checkpoint(self, file):
+        checkpoint = torch.load(file)
+        self.qnetwork_local = fc_model.Network(checkpoint['input_size'],
+                                 checkpoint['output_size'],
+                                 checkpoint['hidden_layers'],
+                                 checkpoint['drop_p']).to(device)
+        self.qnetwork_local.load_state_dict(checkpoint['state_dict'])
+        self.qnetwork_target = fc_model.Network(checkpoint['input_size'],
+                                 checkpoint['output_size'],
+                                 checkpoint['hidden_layers'],
+                                 checkpoint['drop_p']).to(device)
+        self.qnetwork_target.load_state_dict(checkpoint['state_dict'])
 
 class ReplayBuffer:
     """Fixed-size buffer to store experience tuples."""
