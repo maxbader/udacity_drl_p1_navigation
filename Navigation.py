@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from collections import deque
 from dqn_agent import Agent
+import json
 
 #env = UnityEnvironment(file_name="./Banana_Linux/Banana.x86_64")
 env = UnityEnvironment(file_name="./Banana_Linux_NoVis/Banana.x86_64")
@@ -11,7 +12,7 @@ env = UnityEnvironment(file_name="./Banana_Linux_NoVis/Banana.x86_64")
 brain_name = env.brain_names[0]
 brain = env.brains[brain_name]
 
-def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[256, 256], drop_p=0.0):
+def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[256, 256], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=100):
     """Deep Q-Learning.
 
     Params
@@ -22,7 +23,7 @@ def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, h
         eps_decay (float): multiplicative factor (per episode) for decreasing epsilon
         hidden_layers: list of integers, the sizes of the hidden layers
     """
-    agent = Agent(state_size=37, action_size=4, seed=seed, hidden_layers=hidden_layers)
+    agent = Agent(state_size=37, action_size=4, seed=seed, hidden_layers=hidden_layers, GAMMA=GAMMA, LR=LR, UPDATE_EVERY=UPDATE_EVERY)
     
     scores = []                        # list containing scores from each episode
     scores_window = deque(maxlen=10)   # last 100 scores
@@ -59,7 +60,21 @@ def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, h
 
 scores = dict()
 
-scores['hidden_layers = [128,128], drop_p=0.0]'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0)
+with open("scores.json", 'r+') as dataFile:
+    scores = json.loads(dataFile.readline())
+ 
+scores['hidden_layers = [256,256], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+scores['hidden_layers = [256,256], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+scores['hidden_layers = [128,128], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+scores['hidden_layers = [128,128], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+scores['hidden_layers = [64,64],   drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+scores['hidden_layers = [64,64],   drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+
+json = json.dumps(scores)
+f = open("scores.json","w")
+f.write(json)
+f.close()
+
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -68,7 +83,9 @@ def running_mean(x, N):
     cumsum = np.cumsum(np.insert(x, 0, 0))
     return (cumsum[N:] - cumsum[:-N]) / float(N)
 
-fig, axs = plt.subplots(len(scores))
+nr_of_plots = len(scores)
+fig, axs = plt.subplots(nr_of_plots)
+fig.subplots_adjust(hspace=.5)
 idx_plot = 0
 for key, value in scores.items():
     score = scores[key]
@@ -78,4 +95,4 @@ for key, value in scores.items():
     axs[idx_plot].plot(score_mean)
     axs[idx_plot].grid()
     idx_plot = idx_plot + 1
-    
+plt.show()

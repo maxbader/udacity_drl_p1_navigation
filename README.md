@@ -1,6 +1,29 @@
 # Porject 1: Details to my Solution 
 
-For this project I used the DeepQNetwork used in the Lunar Landing example as base.
+## The Solution
+Please visit the **Navigation.ipynb** Jupyter notebook to check my solution. I also implemented a pur python version for debugging in **Navigation.py**.
+
+## Learning Algorithm
+For this project I used the DeepQNetwork used in the Lunar Landing example as base with a replay buffer.
+### hyperparameter
+### model architectures
+The neurnal network is has *two hidden layers* each with *128* neurons connected with a *ReLU* activation function. For testing I also tried to use dropouts but with not much success.
+#### Traning
+For the training I used a 
+
+* discount factor of GAMMA=0.99
+* learning ragte of LR=0.0005
+* batch size BATCH_SIZE = 64
+
+#### Replaybuffer
+For the replay buffer I used a 
+
+* buffer size of 100000 entries and an
+* update every UPDATE_EVERY=100 events 
+    * using bigger nummers did not make sence because one epesote had less than 400 events.)
+    * using a smaller number like 50 caused a lower trainig rate. 
+
+
 
 On the end I found that a network with two hidden layers 128x128 with a replaybuffer worked best and I was able to solve the challange within 1700 interation but also in 1100 using dropouts.
 

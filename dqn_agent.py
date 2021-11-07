@@ -9,17 +9,14 @@ import qnetwork
 
 BUFFER_SIZE = int(1e5)  # replay buffer size
 BATCH_SIZE = 64         # minibatch size
-GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
-LR = 5e-4               # learning rate 
-UPDATE_EVERY = 50       # how often to update the network
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Agent():
     """Interacts with and learns from the environment."""
 
-    def __init__(self, state_size, action_size, seed, hidden_layers=[256, 256], drop_p=0.0):
+    def __init__(self, state_size, action_size, seed, hidden_layers=[256, 256], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=100):
         """Initialize an Agent object.
         
         Params
@@ -28,15 +25,22 @@ class Agent():
             action_size (int): dimension of each action
             seed (int): random seed
             hidden_layers: list of integers, the sizes of the hidden layers
+            drop_p: dropout rate
+            GAMMA: discount factor
+            LR: learning rate
+            UPDATE_EVERY = 50       # how often to update the network
         """
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(seed)
+        self.GAMMA = GAMMA
+        self.LR = LR
+        self.UPDATE_EVERY = UPDATE_EVERY
 
         # Q-Network
         self.qnetwork_local =  qnetwork.Network(state_size, action_size, hidden_layers, drop_p).to(device)
         self.qnetwork_target = qnetwork.Network(state_size, action_size, hidden_layers, drop_p).to(device)
-        self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
+        self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=self.LR)
 
         # Replay memory
         self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
@@ -50,12 +54,12 @@ class Agent():
         self.memory.add(state, action, reward, next_state, done)
         
         # Learn every UPDATE_EVERY time steps.
-        self.t_step = (self.t_step + 1) % UPDATE_EVERY
+        self.t_step = (self.t_step + 1) % self.UPDATE_EVERY
         if self.t_step == 0:
             # If enough samples are available in memory, get random subset and learn
             if len(self.memory) > BATCH_SIZE:
                 experiences = self.memory.sample()
-                self.learn(experiences, GAMMA)
+                self.learn(experiences, self.GAMMA)
 
     def act(self, state, eps=0.):
         """Returns actions for given state as per current policy.
