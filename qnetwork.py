@@ -12,6 +12,7 @@ class Network(nn.Module):
             input_size: integer, size of the input layer
             output_size: integer, size of the output layer
             hidden_layers: list of integers, the sizes of the hidden layers
+            drop_p: dropout rate
         
         '''
         super().__init__()

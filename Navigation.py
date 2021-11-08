@@ -5,12 +5,15 @@ from collections import deque
 from dqn_agent import Agent
 import json
 
-#env = UnityEnvironment(file_name="./Banana_Linux/Banana.x86_64")
-env = UnityEnvironment(file_name="./Banana_Linux_NoVis/Banana.x86_64")
+PLOT_ONLY = False
+if PLOT_ONLY == False:
+    #env = UnityEnvironment(file_name="./Banana_Linux/Banana.x86_64")
+    env = UnityEnvironment(file_name="./Banana_Linux_NoVis/Banana.x86_64")
 
-# get the default brain
-brain_name = env.brain_names[0]
-brain = env.brains[brain_name]
+    # get the default brain
+    brain_name = env.brain_names[0]
+    brain = env.brains[brain_name]
+
 
 def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[256, 256], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=100):
     """Deep Q-Learning.
@@ -51,7 +54,6 @@ def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, h
             if np.mean(scores_window)<13.0:
                 print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
                 agent.save_checkpoint('checkpoint_trained.pth')
-
             else:
                 print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode-100, np.mean(scores_window)))
                 agent.save_checkpoint('checkpoint_solved.pth')
@@ -63,12 +65,34 @@ scores = dict()
 with open("scores.json", 'r+') as dataFile:
     scores = json.loads(dataFile.readline())
  
-scores['hidden_layers = [256,256], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
-scores['hidden_layers = [256,256], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
-scores['hidden_layers = [128,128], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
-scores['hidden_layers = [128,128], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
-scores['hidden_layers = [64,64],   drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
-scores['hidden_layers = [64,64],   drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+parameter = {'hidden_layers': [256,256],
+             'drop_p': 0.2,
+             'eps_start': 1.0,
+             'eps_end': 0.1,
+             'eps_decay': 0.995,
+             'seed': 0,
+             'GAMMA': 0.99,
+             'LR': 0.0005,
+             'UPDATE_EVERY': 50,
+             'BUFFER_SIZE': 100000,
+             'BATCH_SIZE': 64,
+             'TAU': 0.001}
+
+#scores['hidden_layers = [256,256], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+#scores['hidden_layers = [256,256], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+#scores['hidden_layers = [128,128], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+#scores['hidden_layers = [128,128], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+#scores['hidden_layers = [64,64],   drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+#scores['hidden_layers = [64,64],   drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+scores['hidden_layers = [256,256], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+scores['hidden_layers = [256,256], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+scores['hidden_layers = [128,128], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+scores['hidden_layers = [128,128], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+
+#scores['hidden_layers = [64,64],   drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+#scores['hidden_layers = [64,64],   drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+
+
 
 json = json.dumps(scores)
 f = open("scores.json","w")
@@ -83,16 +107,30 @@ def running_mean(x, N):
     cumsum = np.cumsum(np.insert(x, 0, 0))
     return (cumsum[N:] - cumsum[:-N]) / float(N)
 
-nr_of_plots = len(scores)
-fig, axs = plt.subplots(nr_of_plots)
-fig.subplots_adjust(hspace=.5)
-idx_plot = 0
+if False:
+    nr_of_plots = len(scores)
+    fig, axs = plt.subplots(nr_of_plots)
+    fig.subplots_adjust(hspace=.5)
+    idx_plot = 0
+    for key, value in scores.items():
+        score = scores[key]
+        score_mean = running_mean(score, 100)
+        axs[idx_plot].set_ylim([-5, 25])
+        axs[idx_plot].set_title(key)
+        axs[idx_plot].plot(score)
+        axs[idx_plot].plot(score_mean)
+        axs[idx_plot].grid()
+        idx_plot = idx_plot + 1
+    plt.show()
+
+
+plt.figure(2)
 for key, value in scores.items():
     score = scores[key]
-    score_mean = running_mean(score, 100)
-    axs[idx_plot].set_title(key)
-    axs[idx_plot].plot(score)
-    axs[idx_plot].plot(score_mean)
-    axs[idx_plot].grid()
-    idx_plot = idx_plot + 1
+    y = running_mean(score, 100)
+    x = list(range(0, len(y)))
+    plt.plot(y, label=key)
+plt.grid()
+plt.axhline(y=13, color='r', linestyle='-')
+plt.legend()
 plt.show()

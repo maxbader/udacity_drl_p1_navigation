@@ -19,11 +19,8 @@ For the training I used a
 For the replay buffer I used a 
 
 * buffer size of 100000 entries and an
-* update every UPDATE_EVERY=100 events 
-    * using bigger nummers did not make sence because one epesote had less than 400 events.)
-    * using a smaller number like 50 caused a lower trainig rate. 
-
-
+* update every UPDATE_EVERY=50 events 
+    * using bigger nummers did not make sence because one epesote had less than 400 events.
 
 On the end I found that a network with two hidden layers 128x128 with a replaybuffer worked best and I was able to solve the challange within 1700 interation but also in 1100 using dropouts.
 
