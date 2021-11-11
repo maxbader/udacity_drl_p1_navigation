@@ -5,8 +5,8 @@ from collections import deque
 from dqn_agent import Agent
 import json
 
-PLOT_ONLY = False
-if PLOT_ONLY == False:
+LOAD_ENV = True
+if LOAD_ENV:
     #env = UnityEnvironment(file_name="./Banana_Linux/Banana.x86_64")
     env = UnityEnvironment(file_name="./Banana_Linux_NoVis/Banana.x86_64")
 
@@ -15,22 +15,22 @@ if PLOT_ONLY == False:
     brain = env.brains[brain_name]
 
 
-def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[256, 256], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=100):
+def dqn(parameter_training, parameter_agent):
     """Deep Q-Learning.
 
     Params
     ======
-        n_episodes (int): maximum number of training episodes
-        eps_start (float): starting value of epsilon, for epsilon-greedy action selection
-        eps_end (float): minimum value of epsilon
-        eps_decay (float): multiplicative factor (per episode) for decreasing epsilon
-        hidden_layers: list of integers, the sizes of the hidden layers
+        parameter_training (dict)
+        parameter_agent (dict)
     """
-    agent = Agent(state_size=37, action_size=4, seed=seed, hidden_layers=hidden_layers, GAMMA=GAMMA, LR=LR, UPDATE_EVERY=UPDATE_EVERY)
+    agent = Agent(parameter_agent)   
     
-    scores = []                        # list containing scores from each episode
-    scores_window = deque(maxlen=10)   # last 100 scores
-    eps = eps_start                    # initialize epsilon
+    scores_window = deque(maxlen=10)              # last 100 scores
+    eps = parameter_training['eps_start']         # initialize epsilon
+    eps_end = parameter_training['eps_end']       # minimum value of epsilon 
+    eps_decay = parameter_training['eps_decay']   # multiplicative factor (per episode) for decreasing epsilon
+    n_episodes = parameter_training['n_episodes'] # maximum number of training episodes
+    scores = []                                   # list containing scores from each episode
     for i_episode in range(1, n_episodes+1):
         env_info = env.reset(train_mode=True)[brain_name] # reset the environment
         state = env_info.vector_observations[0]            # get the current state
@@ -60,23 +60,74 @@ def dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, h
     return scores
 
 
-scores = dict()
+scores = []
 
-with open("scores.json", 'r+') as dataFile:
-    scores = json.loads(dataFile.readline())
+#with open("scores_param.json", 'r+') as dataFile:
+#    scores = json.loads(dataFile.readline())
  
-parameter = {'hidden_layers': [256,256],
-             'drop_p': 0.2,
+parameter_training = {'n_episodes': 2000,
              'eps_start': 1.0,
              'eps_end': 0.1,
-             'eps_decay': 0.995,
+             'eps_decay': 0.995}
+parameter_agent = {
+             'state_size': 37, 
+             'action_size': 4, 
+             'hidden_layers': [64,64],
+             'drop_p': 0.0,
              'seed': 0,
              'GAMMA': 0.99,
              'LR': 0.0005,
-             'UPDATE_EVERY': 50,
+             'UPDATE_EVERY': 25,
              'BUFFER_SIZE': 100000,
              'BATCH_SIZE': 64,
              'TAU': 0.001}
+
+def compute_if_needed(parameter_training, parameter_agent, scores):
+    found = False
+    for score in scores:
+        if (score['agent'] == parameter_agent):
+            found = True
+    if found == False:
+        score = { 'training': parameter_training,
+          'agent':  parameter_agent,
+          'score' : dqn(parameter_training, parameter_agent)}
+        scores.append(score)
+
+
+def save_score(scores, file_name):
+    dump = json.dumps(scores)
+    f = open(file_name,"w")
+    f.write(dump)
+    f.close()
+
+parameter_agent['BUFFER_SIZE'] = 1
+parameter_agent['UPDATE_EVERY'] = 1
+compute_if_needed(parameter_training, parameter_agent, scores)
+save_score(scores, 'scores_param.json')
+
+if False: 
+    parameter_agent['BUFFER_SIZE'] = 100000
+    parameter_agent['UPDATE_EVERY'] = 25
+    compute_if_needed(parameter_training, parameter_agent, scores)
+    save_score(scores, 'scores_param.json')
+    parameter_agent['UPDATE_EVERY'] = 50
+    compute_if_needed(parameter_training, parameter_agent, scores)
+    save_score(scores, 'scores_param.json')
+    parameter_agent['UPDATE_EVERY'] = 100
+    compute_if_needed(parameter_training, parameter_agent, scores)
+    save_score(scores, 'scores_param.json')
+    parameter_agent['BUFFER_SIZE'] = 1000
+    parameter_agent['UPDATE_EVERY'] = 25
+    compute_if_needed(parameter_training, parameter_agent, scores)
+    save_score(scores, 'scores_param.json')
+    parameter_agent['UPDATE_EVERY'] = 50
+    compute_if_needed(parameter_training, parameter_agent, scores)
+    save_score(scores, 'scores_param.json')
+    parameter_agent['UPDATE_EVERY'] = 100
+    compute_if_needed(parameter_training, parameter_agent, scores)
+    save_score(scores, 'scores_param.json')
+
+
 
 #scores['hidden_layers = [256,256], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
 #scores['hidden_layers = [256,256], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
@@ -84,20 +135,29 @@ parameter = {'hidden_layers': [256,256],
 #scores['hidden_layers = [128,128], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
 #scores['hidden_layers = [64,64],   drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
 #scores['hidden_layers = [64,64],   drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
-scores['hidden_layers = [256,256], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
-scores['hidden_layers = [256,256], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
-scores['hidden_layers = [128,128], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
-scores['hidden_layers = [128,128], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+#scores['hidden_layers = [32,32],   drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[32, 32],   drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
+#scores['hidden_layers = [32,32],   drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[32, 32],   drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=50)
 
+#scores['hidden_layers = [256,256], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+#scores['hidden_layers = [256,256], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+#scores['hidden_layers = [128,128], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+#scores['hidden_layers = [128,128], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
 #scores['hidden_layers = [64,64],   drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
 #scores['hidden_layers = [64,64],   drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+#scores['hidden_layers = [32,32],   drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[32, 32],   drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+#scores['hidden_layers = [32,32],   drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[32, 32],   drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=25)
+
+#scores['hidden_layers = [256,256], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10)
+#scores['hidden_layers = [256,256], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10)
+#scores['hidden_layers = [128,128], drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10)
+#scores['hidden_layers = [128,128], drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[128, 128], drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10)
+#scores['hidden_layers = [64,64],   drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10)
+#scores['hidden_layers = [64,64],   drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[64, 64],   drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10)
+#scores['hidden_layers = [32,32],   drop_p=0.0], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[32, 32],   drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10)
+#scores['hidden_layers = [32,32],   drop_p=0.2], GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10'] = dqn(n_episodes=2000, eps_start=1.0, eps_end=0.01, eps_decay=0.995, seed=0, hidden_layers=[32, 32],   drop_p=0.2, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=10)
 
 
 
-json = json.dumps(scores)
-f = open("scores.json","w")
-f.write(json)
-f.close()
 
 
 import matplotlib.pyplot as plt
@@ -125,9 +185,10 @@ if False:
 
 
 plt.figure(2)
-for key, value in scores.items():
-    score = scores[key]
-    y = running_mean(score, 100)
+for score in scores:
+    key = str(score['agent'])
+    values = score['score']
+    y = running_mean(values, 100)
     x = list(range(0, len(y)))
     plt.plot(y, label=key)
 plt.grid()

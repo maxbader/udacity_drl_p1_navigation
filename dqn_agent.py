@@ -7,43 +7,52 @@ import torch.nn.functional as F
 import torch.optim as optim
 import qnetwork
 
-BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 64         # minibatch size
-TAU = 1e-3              # for soft update of target parameters
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+    
 class Agent():
     """Interacts with and learns from the environment."""
 
-    def __init__(self, state_size, action_size, seed, hidden_layers=[256, 256], drop_p=0.0, GAMMA=0.99, LR=5e-4, UPDATE_EVERY=100):
+    @staticmethod
+    def default_parameter():
+        return {
+             'state_size': 37, 
+             'action_size': 4, 
+             'hidden_layers': [64,64],
+             'drop_p': 0.0,
+             'seed': 0,
+             'GAMMA': 0.99,
+             'LR': 0.0005,
+             'UPDATE_EVERY': 25,
+             'BUFFER_SIZE': 100000,
+             'BATCH_SIZE': 64,
+             'TAU': 0.001}
+
+    def __init__(self, parameter):
         """Initialize an Agent object.
         
         Params
         ======
-            state_size (int): dimension of each state
-            action_size (int): dimension of each action
-            seed (int): random seed
-            hidden_layers: list of integers, the sizes of the hidden layers
-            drop_p: dropout rate
-            GAMMA: discount factor
-            LR: learning rate
-            UPDATE_EVERY = 50       # how often to update the network
+            parameters            
         """
-        self.state_size = state_size
-        self.action_size = action_size
-        self.seed = random.seed(seed)
-        self.GAMMA = GAMMA
-        self.LR = LR
-        self.UPDATE_EVERY = UPDATE_EVERY
+        self.state_size = parameter['state_size']           # state_size (int): dimension of each state
+        self.action_size = parameter['action_size']         # action_size (int): dimension of each action  
+        self.seed = random.seed(parameter['seed'])          # random seed
+        self.GAMMA = parameter['GAMMA']                     # discount factor
+        self.LR = parameter['LR']                           # learning rate
+        self.UPDATE_EVERY = parameter['UPDATE_EVERY']       # how often to update the network
+        self.BUFFER_SIZE = parameter['BUFFER_SIZE']         # replay buffer size
+        self.BATCH_SIZE = parameter['BATCH_SIZE']           # minibatch size
+        self.TAU = parameter['TAU']                         # for soft update of target parameters
 
         # Q-Network
-        self.qnetwork_local =  qnetwork.Network(state_size, action_size, hidden_layers, drop_p).to(device)
-        self.qnetwork_target = qnetwork.Network(state_size, action_size, hidden_layers, drop_p).to(device)
+        self.qnetwork_local =  qnetwork.Network(self.state_size, self.action_size, parameter['hidden_layers'], parameter['drop_p']).to(device)
+        self.qnetwork_target = qnetwork.Network(self.state_size, self.action_size, parameter['hidden_layers'], parameter['drop_p']).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=self.LR)
 
         # Replay memory
-        self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
+        self.memory = ReplayBuffer(self.action_size, self.BUFFER_SIZE, self.BATCH_SIZE, self.seed)
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
         
@@ -57,7 +66,7 @@ class Agent():
         self.t_step = (self.t_step + 1) % self.UPDATE_EVERY
         if self.t_step == 0:
             # If enough samples are available in memory, get random subset and learn
-            if len(self.memory) > BATCH_SIZE:
+            if len(self.memory) > self.BATCH_SIZE:
                 experiences = self.memory.sample()
                 self.learn(experiences, self.GAMMA)
 
@@ -107,7 +116,7 @@ class Agent():
         self.optimizer.step()
 
         # ------------------- update target network ------------------- #
-        self.soft_update(self.qnetwork_local, self.qnetwork_target, TAU)                     
+        self.soft_update(self.qnetwork_local, self.qnetwork_target, self.TAU)                     
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
