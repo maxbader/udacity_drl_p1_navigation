@@ -1,28 +1,33 @@
-# Porject 1: Details to my Solution 
+# Porject 1: Details to my Solution
+
 
 ## The Solution
-Please visit the **Navigation.ipynb** Jupyter notebook to check my solution. I also implemented a pur python version for debugging in **Navigation.py**.
+
+Please visit the **Navigation.ipynb** Jupyter notebook to check my solution.
+
+In order to find good parameters, I generated the following figure showing the average score over the last 100 scores.
+The first row shows a network with two hidden layers of [64,64] followed by [128,128] and in the last row [256,256] neurons and the column with dropout rates of 0.0, 0.25 and 0.5.
+The plots itself are showing the average score using Replaybuffer of 100, 10000 and 100000 with updates as shown in the legend. The buffer size of 100 and an update every 100 should represent the use of not Replaybuffer.
+
+![sores](sores.gif)
+
+Depending on the setting, I was able to train the network within 500 episodes to gain an average result of 13 using two hidden layers with each 256 neurons and a replay buffer with a high update rate.
 
 ## Learning Algorithm
+
 For this project I used the DeepQNetwork used in the Lunar Landing example as base with a replay buffer.
-### hyperparameter
-### model architectures
-The neurnal network is has *two hidden layers* each with *128* neurons connected with a *ReLU* activation function. For testing I also tried to use dropouts but with not much success.
+
+### hyperparameter and model architectures
+
+The neural network has *two hidden layers* connected with a *ReLU* activation function. For testing, I also tried to use dropouts, but the data suggested that it makes only sense on bigger networks such like two hidden layers with each 265 neurons.
+
 #### Traning
-For the training I used a 
+
+For the training, I used a
 
 * discount factor of GAMMA=0.99
 * learning ragte of LR=0.0005
 * batch size BATCH_SIZE = 64
-
-#### Replaybuffer
-For the replay buffer I used a 
-
-* buffer size of 100000 entries and an
-* update every UPDATE_EVERY=50 events 
-    * using bigger nummers did not make sence because one epesote had less than 400 events.
-
-On the end I found that a network with two hidden layers 128x128 with a replaybuffer worked best and I was able to solve the challange within 1700 interation but also in 1100 using dropouts.
 
 
 # Install
