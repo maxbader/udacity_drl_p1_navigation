@@ -29,7 +29,15 @@ For the training, I used a
 * learning ragte of LR=0.0005
 * batch size BATCH_SIZE = 64
 
+## future ideas
 
+* I would like to test networks with more layers of different sizes, but time is currently for me expensive :-).
+* Since I used the lunar lander network implantation as base it was easy to use the replay buffer, but It would make sense to test also a implementation without it. Currently I tried only reducing the replay buffer and update rate to mimic a system without replay buffer.
+* Tuning GAMMA, LR and BATCH_SIZE was not needed since I received always a score of 13 with one of my solutions, but of course these parameters can be optimized.
+
+## Suggestions for the Exercise
+
+Currently, it is not clear what the feature vector represents and my questions in the forum was not answered. This is sad because it would make sense to get this information to get a better feeling on the problem.
 # Install
 
 ### Ubuntu 20.04
