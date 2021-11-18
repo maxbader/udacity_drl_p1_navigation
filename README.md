@@ -3,13 +3,14 @@
 
 ## The Solution
 
-Please visit the **Navigation.ipynb** Jupyter notebook to check my solution.
+Please visit the **Navigation.ipynb** Jupyter notebook to check my solution. Starting from the block __4. It's Your Turn!__.
 
 In order to find good parameters, I generated the following figure showing the average score over the last 100 scores.
 The first row shows a network with two hidden layers of [64,64] followed by [128,128] and in the last row [256,256] neurons and the column with dropout rates of 0.0, 0.25 and 0.5.
 The plots itself are showing the average score using Replaybuffer of 100, 10000 and 100000 with updates as shown in the legend. The buffer size of 100 and an update every 100 should represent the use of not Replaybuffer.
 
 ![sores](sores.gif)
+
 
 Depending on the setting, I was able to train the network within 500 episodes to gain an average result of 13 using two hidden layers with each 256 neurons and a replay buffer with a high update rate.
 
@@ -29,11 +30,18 @@ For the training, I used a
 * learning ragte of LR=0.0005
 * batch size BATCH_SIZE = 64
 
+## Result
+
+<video width="1780" height="720">
+<source src="result.mp4" type="video/mp4">
+</video>
+
 ## future ideas
 
 * I would like to test networks with more layers of different sizes, but time is currently for me expensive :-).
 * Since I used the lunar lander network implantation as base it was easy to use the replay buffer, but It would make sense to test also a implementation without it. Currently I tried only reducing the replay buffer and update rate to mimic a system without replay buffer.
 * Tuning GAMMA, LR and BATCH_SIZE was not needed since I received always a score of 13 with one of my solutions, but of course these parameters can be optimized.
+
 
 ## Suggestions for the Exercise
 

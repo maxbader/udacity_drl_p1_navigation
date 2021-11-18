@@ -141,12 +141,12 @@ class Agent():
         
     def load_checkpoint(self, file):
         checkpoint = torch.load(file)
-        self.qnetwork_local = fc_model.Network(checkpoint['input_size'],
+        self.qnetwork_local = qnetwork.Network(checkpoint['input_size'],
                                  checkpoint['output_size'],
                                  checkpoint['hidden_layers'],
                                  checkpoint['drop_p']).to(device)
         self.qnetwork_local.load_state_dict(checkpoint['state_dict'])
-        self.qnetwork_target = fc_model.Network(checkpoint['input_size'],
+        self.qnetwork_target = qnetwork.Network(checkpoint['input_size'],
                                  checkpoint['output_size'],
                                  checkpoint['hidden_layers'],
                                  checkpoint['drop_p']).to(device)
