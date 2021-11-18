@@ -32,6 +32,8 @@ For the training, I used a
 
 ## Result
 
+Click on the image to watch the result of my trained network.
+
 [![Watch the video](./result.png)](https://youtu.be/Dqay-41YOyI)
 
 
