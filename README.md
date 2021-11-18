@@ -32,9 +32,8 @@ For the training, I used a
 
 ## Result
 
-<video width="1780" height="720">
-<source src="result.mp4" type="video/mp4">
-</video>
+[![IMAGE ALT TEXT HERE](result.jpg)](https://www.youtube.com/watch?v=Dqay-41YOyI)
+
 
 ## future ideas
 
