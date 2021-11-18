@@ -32,7 +32,7 @@ For the training, I used a
 
 ## Result
 
-[![IMAGE ALT TEXT HERE](result.jpg)](https://www.youtube.com/watch?v=Dqay-41YOyI)
+[![Watch the video](./result.png)](https://youtu.be/Dqay-41YOyI)
 
 
 ## future ideas
