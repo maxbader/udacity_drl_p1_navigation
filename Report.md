@@ -8,7 +8,7 @@ For this project I used a DeepQNetwork with a replay buffer similar to the _Luna
 In order to find suiting parameters,  I generated with the _Code Block 4.1 - 4.6_ the following figure showing average scores over the last 100 scores.
 The first row shows a network with two hidden layers of [64,64] followed by [128,128] and in the last row [256,256] neurons and the column with dropout rates of 0.0, 0.25 and 0.5.
 The plots itself are showing the average score using Replaybuffer of 100, 10000 and 100000 with updates as shown in the legend. The buffer size of 100 and an update every 100 should represent the use of not Replaybuffer.
-![sores](sores.gif)
+![sores](scores.gif)
 Depending on the setting, I was able to train the network within 500 episodes to gain an average result of 13 using two hidden layers with each 256 neurons and a replay buffer with a high update rate.
 ## Plot of Rewards
 The plots and data generated in the first part _(Code Block 4.1 - 4.6)_ suggested that the following configuration suites the requirmentes best.
@@ -31,7 +31,7 @@ For the training, I used a
 * batch size BATCH_SIZE = 64
 * 
 Therefore this parameter are trained again an plotted in more detail in _(Code Block 4.7 - 4.8)_
-![sores](sore.gif)
+![sores](score.gif)
 
 @drop-out rate
 The data suggested that it makes only sense on bigger networks such like two hidden layers with each 265 neurons.
