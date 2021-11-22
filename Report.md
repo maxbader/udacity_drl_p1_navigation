@@ -42,8 +42,6 @@ Click on the image to watch the result of my trained network.
 
 [![Watch the video](./result.png)](https://youtu.be/Dqay-41YOyI)
 
-[![Watch the video](https://img.youtube.com/vi/Dqay-41YOyI/0.jpg)](https://www.youtube.com/watch?v=Dqay-41YOyI)
-
 ## Ideas for Future Work
 
 * I would like to test networks with more layers of different sizes, but time is currently for me expensive :-).
