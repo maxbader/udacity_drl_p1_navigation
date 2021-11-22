@@ -1,3 +1,8 @@
+# Project 1: Navigation
+## Project Details
+The goal of this project was to steer an agent to collect bananas ant to reach a score over 13 under 1800 training cycles.
+
+## Getting Started
 ### Ubuntu 20.04
 
 1. Install anaconda3
@@ -15,8 +20,13 @@ pip3 install -r requirements.txt
 jupyter kernelspec list
 jupyter kernelspec uninstall unwanted-kernel
 ```
- 
-# Project 1: Navigation
+## Instructions
+Please checkout the `Report.md` and the `Navigation.ipynb`
+### Running the code
+If you like to run the code you can start at _Block 4.1_ in `Navigation.ipynb` and be aware that the last part _4.9 Live demo of a selected network_ is designed to run a live demo which loads the graphical UnityEnvironment. 
+_Block 4.4_ just trains a lot of networks for comparison but stores the results and since I stored the results also in this repo it will not train much. If you like to re-train a network checkout _Block 4.7_
+
+# Original readme text provided in the project
 
 ### Introduction
 
